@@ -18,6 +18,31 @@ fn print_version() {
     println!("{} version {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 }
 
+fn print_add_help() {
+    println!("Usage: {} add [options] \"<description>\"", env!("CARGO_PKG_NAME"));
+    println!("");
+    println!("Options:");
+    println!("  -h, --help    Print this help message");
+}
+
+fn add(description: String) {
+    println!("Added todo item with description '{}'", description);
+}
+
+fn parse_add(args: Vec<String>) {
+    // Check if there are enough arguments
+    if args.len() == 0 {
+        print_add_help();
+        std::process::exit(1);
+    }
+
+    // Check add input
+    match args[0].as_str() {
+        "-h" | "--help" => print_add_help(),
+        _ => add(args[0].as_str().to_string())
+    }
+}
+
 fn parse_arguments(args: Vec<String>) {
     // Check if there are enough arguments
     if args.len() < 2 {
@@ -29,7 +54,7 @@ fn parse_arguments(args: Vec<String>) {
     match args[1].as_str() {
         "-h" | "--help" => print_help(),
         "-v" | "--version" => print_version(),
-        "add" => println!("add"),
+        "add" => parse_add(args[2..args.len()].to_vec()),
         "list" => println!("list"),
         "update" => println!("update"),
         "remove" => println!("remove"),
