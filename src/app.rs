@@ -8,7 +8,6 @@ pub trait Runnable {
 }
 
 impl Runnable for App {
-
     fn run(args: Vec<String>) -> () {
         // Check if there are enough arguments
         if args.len() < 2 {
@@ -34,9 +33,11 @@ impl Runnable for App {
 }
 
 impl App {
-
     fn print_help() -> () {
-        println!("Usage: {} [options] <verb> [verb_options]", env!("CARGO_PKG_NAME"));
+        println!(
+            "Usage: {} [options] <verb> [verb_options]",
+            env!("CARGO_PKG_NAME")
+        );
         println!("");
         println!("Options:");
         println!("  -h, --help    Print this help message");
@@ -48,15 +49,25 @@ impl App {
         println!("  update        Update a todo item");
         println!("  remove        Remove a todo item");
         println!("");
-        println!("Run '{} <verb> --help' for more information on a verb.", env!("CARGO_PKG_NAME"));
+        println!(
+            "Run '{} <verb> --help' for more information on a verb.",
+            env!("CARGO_PKG_NAME")
+        );
     }
 
     fn print_version() {
-        println!("{} version {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+        println!(
+            "{} version {}",
+            env!("CARGO_PKG_NAME"),
+            env!("CARGO_PKG_VERSION")
+        );
     }
 
     fn print_add_help() -> () {
-        println!("Usage: {} add [options] \"<description>\"", env!("CARGO_PKG_NAME"));
+        println!(
+            "Usage: {} add [options] \"<description>\"",
+            env!("CARGO_PKG_NAME")
+        );
         println!("");
         println!("Options:");
         println!("  -h, --help    Print this help message");
@@ -86,7 +97,7 @@ impl App {
         // Check add input
         match args[0].as_str() {
             "-h" | "--help" => App::print_add_help(),
-            _ => App::add(args[0].as_str().to_string())
+            _ => App::add(args[0].as_str().to_string()),
         }
     }
 }
