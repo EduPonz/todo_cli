@@ -1,7 +1,5 @@
-use crate::app::App;
-use crate::app::Runnable;
-
-mod app;
+use todo::app::App;
+use todo::app::Runnable;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
