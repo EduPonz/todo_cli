@@ -3,9 +3,13 @@ use std::io::prelude::*;
 
 pub struct App();
 
-impl App {
+pub trait Runnable {
+    fn run(args: Vec<String>) -> ();
+}
 
-    pub fn run(args: Vec<String>) -> () {
+impl Runnable for App {
+
+    fn run(args: Vec<String>) -> () {
         // Check if there are enough arguments
         if args.len() < 2 {
             App::print_help();
@@ -27,6 +31,9 @@ impl App {
             }
         }
     }
+}
+
+impl App {
 
     fn print_help() -> () {
         println!("Usage: {} [options] <verb> [verb_options]", env!("CARGO_PKG_NAME"));
