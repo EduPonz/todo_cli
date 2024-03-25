@@ -1,3 +1,6 @@
+use std::fs::OpenOptions;
+use std::io::prelude::*;
+
 fn print_help() {
     println!("Usage: {} [options] <verb> [verb_options]", env!("CARGO_PKG_NAME"));
     println!("");
@@ -27,6 +30,16 @@ fn print_add_help() {
 
 fn add(description: String) {
     println!("Added todo item with description '{}'", description);
+
+    let mut file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("todo.txt")
+        .unwrap();
+
+    if let Err(e) = writeln!(file, "{}", description) {
+        eprintln!("Couldn't write to file: {}", e);
+    }
 }
 
 fn parse_add(args: Vec<String>) {
@@ -55,9 +68,9 @@ fn parse_arguments(args: Vec<String>) {
         "-h" | "--help" => print_help(),
         "-v" | "--version" => print_version(),
         "add" => parse_add(args[2..args.len()].to_vec()),
-        "list" => println!("list"),
-        "update" => println!("update"),
-        "remove" => println!("remove"),
+        "list" => println!("list is not implemented yet"),
+        "update" => println!("update is not implemented yet"),
+        "remove" => println!("remove is not implemented yet"),
         _ => {
             println!("Unknown verb '{}'", args[1]);
             print_help();
