@@ -5,13 +5,13 @@ mod add;
 mod parser;
 
 pub trait Runnable {
-    fn run(args: Vec<String>) -> ();
+    fn run(args: Vec<String>) -> Result<(), String>;
 }
 
 pub struct App();
 
 impl Runnable for App {
-    fn run(args: Vec<String>) -> () {
-        RootParser::parse(args);
+    fn run(args: Vec<String>) -> Result<(), String> {
+        RootParser::parse(args)
     }
 }

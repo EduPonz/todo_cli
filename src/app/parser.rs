@@ -2,7 +2,7 @@ use crate::app::add::Adder;
 
 pub trait Parser {
     fn print_help() -> ();
-    fn parse(args: Vec<String>) -> ();
+    fn parse(args: Vec<String>) -> Result<(), String>;
 }
 
 pub struct RootParser();
@@ -40,26 +40,48 @@ impl Parser for RootParser {
         );
     }
 
-    fn parse(args: Vec<String>) -> () {
+    fn parse(args: Vec<String>) -> Result<(), String> {
         // Check if there are enough arguments
+        let mut ret = Ok(());
+
         if args.len() < 2 {
             Self::print_help();
-            std::process::exit(1);
+            ret = Err("Not enough arguments".to_string());
         }
 
-        // Check the first argument
-        match args[1].as_str() {
-            "-h" | "--help" => Self::print_help(),
-            "-v" | "--version" => Self::print_version(),
-            "add" => Adder::parse(args[2..args.len()].to_vec()),
-            "list" => println!("list is not implemented yet"),
-            "update" => println!("update is not implemented yet"),
-            "remove" => println!("remove is not implemented yet"),
-            _ => {
-                println!("Unknown verb '{}'", args[1]);
-                Self::print_help();
-                std::process::exit(1);
+        if !ret.is_err() {
+            // Check the first argument
+            match args[1].as_str() {
+                "-h" | "--help" => {
+                    Self::print_help();
+                    ret = Ok(());
+                }
+                "-v" | "--version" => {
+                    Self::print_version();
+                    ret = Ok(());
+                }
+                "add" => {
+                    ret = Adder::parse(args[2..args.len()].to_vec());
+                }
+                "list" => {
+                    println!("list is not implemented yet");
+                    ret = Ok(());
+                }
+                "update" => {
+                    println!("update is not implemented yet");
+                    ret = Ok(());
+                }
+                "remove" => {
+                    println!("remove is not implemented yet");
+                    ret = Ok(());
+                }
+                _ => {
+                    Self::print_help();
+                    ret = Err("Unknown verb '".to_owned() + &args[1] + "'");
+                }
             }
         }
+
+        ret
     }
 }

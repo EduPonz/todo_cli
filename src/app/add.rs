@@ -16,7 +16,7 @@ impl Parser for Adder {
         println!("  -h, --help    Print this help message");
     }
 
-    fn parse(args: Vec<String>) -> () {
+    fn parse(args: Vec<String>) -> Result<(), String> {
         // Check if there are enough arguments
         if args.len() == 0 {
             Self::print_help();
@@ -28,6 +28,8 @@ impl Parser for Adder {
             "-h" | "--help" => Self::print_help(),
             _ => Self::add(args[0].as_str().to_string()),
         }
+
+        Ok(())
     }
 }
 

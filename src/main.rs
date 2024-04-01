@@ -3,5 +3,8 @@ use todo::app::Runnable;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    App::run(args);
+    match App::run(args) {
+        Ok(_) => (),
+        Err(e) => eprintln!("Error: {}", e),
+    }
 }
