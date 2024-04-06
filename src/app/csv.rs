@@ -95,13 +95,13 @@ impl CSVManager {
         for result in rdr.deserialize() {
             if first_record {
                 first_record = false;
-                println!("Status | Description | Last Updated");
-                println!("-------|-------------|-------------");
+                println!(" ID | Status | Description | Last Updated");
+                println!("----|--------|-------------|-------------");
             }
             let record: CSVRecord = result.unwrap();
             println!(
-                "{} | {} | {}",
-                record.status, record.description, record.last_updated
+                " {} | {} | {} | {}",
+                record.id, record.status, record.description, record.last_updated
             );
         }
 
