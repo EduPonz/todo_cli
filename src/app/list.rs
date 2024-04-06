@@ -1,39 +1,33 @@
 use crate::app::csv::CSVManager;
 use crate::app::parser::Parser;
 
-pub struct Adder();
+pub struct List();
 
-impl Parser for Adder {
+impl Parser for List {
     fn print_help() -> () {
-        println!(
-            "Usage: {} add [options] \"<description>\"",
-            env!("CARGO_PKG_NAME")
-        );
+        println!("Usage: {} list [options]", env!("CARGO_PKG_NAME"));
         println!("");
         println!("Options:");
         println!("  -h, --help    Print this help message");
     }
 
     fn parse(args: Vec<String>) -> Result<(), String> {
-        let mut ret = Ok(());
+        let ret;
 
-        // Check if there are enough arguments
-        if args.len() == 0 {
-            Self::print_help();
-            ret = Err("Not enough arguments".to_string());
-        }
-
-        if !ret.is_err() {
-            // Check add input
+        if args.len() > 0 {
+            // Check list input
             match args[0].as_str() {
                 "-h" | "--help" => {
                     Self::print_help();
                     ret = Ok(());
                 }
                 _ => {
-                    ret = CSVManager::add(args[0].as_str().to_string());
+                    Self::print_help();
+                    ret = Err("Unknown argument '".to_owned() + &args[0] + "'");
                 }
             }
+        } else {
+            ret = CSVManager::list();
         }
 
         ret

@@ -2,6 +2,8 @@ use crate::app::parser::Parser;
 use crate::app::parser::RootParser;
 
 mod add;
+mod csv;
+mod list;
 mod parser;
 
 pub trait Runnable {
