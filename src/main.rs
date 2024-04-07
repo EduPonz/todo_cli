@@ -1,5 +1,5 @@
-use todo::app::App;
-use todo::app::Runnable;
+use todo_cli::app::App;
+use todo_cli::app::Runnable;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
