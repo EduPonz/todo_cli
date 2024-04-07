@@ -1,5 +1,6 @@
 use crate::app::add::Adder;
 use crate::app::list::List;
+use crate::app::update::Updater;
 
 pub trait Parser {
     fn print_help() -> ();
@@ -68,8 +69,7 @@ impl Parser for RootParser {
                     ret = List::parse(args[2..args.len()].to_vec());
                 }
                 "update" => {
-                    println!("update is not implemented yet");
-                    ret = Ok(());
+                    ret = Updater::parse(args[2..args.len()].to_vec());
                 }
                 "remove" => {
                     println!("remove is not implemented yet");

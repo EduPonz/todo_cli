@@ -5,6 +5,7 @@ mod add;
 mod csv;
 mod list;
 mod parser;
+mod update;
 
 pub trait Runnable {
     fn run(args: Vec<String>) -> Result<(), String>;
