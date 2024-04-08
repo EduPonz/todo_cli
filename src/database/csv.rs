@@ -2,9 +2,10 @@ use std::fs::OpenOptions;
 use std::io::Seek;
 
 use chrono::{SecondsFormat, Utc};
-
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::database::DatabaseManager;
 
 pub struct CSVManager();
 
@@ -16,8 +17,8 @@ struct CSVRecord {
     last_updated: String,
 }
 
-impl CSVManager {
-    pub fn add(description: String) -> Result<(), String> {
+impl DatabaseManager for CSVManager {
+    fn add(description: String) -> Result<(), String> {
         let mut ret = Ok(());
         println!("Adding todo item with description '{}'", description);
 
@@ -56,7 +57,7 @@ impl CSVManager {
                 id: last_id,
                 status: "pending".to_string(),
                 description: description,
-                last_updated: Self::now_string(),
+                last_updated: CSVManager::now_string(),
             };
 
             match csv_writer.serialize(record) {
@@ -77,7 +78,7 @@ impl CSVManager {
         ret
     }
 
-    pub fn list() -> Result<(), String> {
+    fn list() -> Result<(), String> {
         let mut ret = Ok(());
 
         // Read the CSV file
@@ -118,14 +119,16 @@ impl CSVManager {
         ret
     }
 
-    pub fn update_description(id: u64, description: String) -> Result<(), String> {
-        Self::update_field(id, "description".to_string(), description)
+    fn update_description(id: u64, description: String) -> Result<(), String> {
+        CSVManager::update_field(id, "description".to_string(), description)
     }
 
-    pub fn update_status(id: u64, status: String) -> Result<(), String> {
-        Self::update_field(id, "status".to_string(), status)
+    fn update_status(id: u64, status: String) -> Result<(), String> {
+        CSVManager::update_field(id, "status".to_string(), status)
     }
+}
 
+impl CSVManager {
     fn update_field(id: u64, field: String, value: String) -> Result<(), String> {
         let mut ret = Ok(());
         let mut records: Vec<CSVRecord> = Vec::new();

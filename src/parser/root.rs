@@ -1,11 +1,7 @@
-use crate::app::add::Adder;
-use crate::app::list::List;
-use crate::app::update::Updater;
-
-pub trait Parser {
-    fn print_help() -> ();
-    fn parse(args: Vec<String>) -> Result<(), String>;
-}
+use crate::parser::add::Adder;
+use crate::parser::list::List;
+use crate::parser::update::Updater;
+use crate::parser::Parser;
 
 pub struct RootParser();
 
