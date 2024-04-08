@@ -128,34 +128,56 @@ impl DatabaseManager for CSVManager {
     }
 
     fn remove(id: u64) -> Result<(), String> {
-        let mut ret = Ok(());
+        let mut ret;
         let mut records: Vec<CSVRecord> = Vec::new();
 
-        // Read the CSV file
-        {
-            // Create the CSV reader
-            let mut csv_reader = match csv::Reader::from_path("todo.csv") {
+        let remove_record = |record: CSVRecord| {
+            if id != record.id {
+                records.push(record);
+            }
+        };
+
+        ret = CSVManager::read_csv("todo.csv".to_string(), remove_record);
+
+        if !ret.is_err() {
+            ret = CSVManager::write_csv("todo.csv".to_string(), records);
+        }
+
+        ret
+    }
+}
+
+impl CSVManager {
+    fn read_csv<Predicate>(csv_file: String, mut predicate: Predicate) -> Result<(), String>
+    where
+        Predicate: FnMut(CSVRecord),
+    {
+        let mut ret = Ok(());
+
+        let mut csv_reader = match csv::Reader::from_path(csv_file) {
+            Ok(r) => r,
+            Err(e) => {
+                return Err(e.to_string());
+            }
+        };
+
+        for result in csv_reader.deserialize::<CSVRecord>() {
+            let record: CSVRecord = match result {
                 Ok(r) => r,
-                Err(e) => {
-                    return Err(e.to_string());
+                Err(_e) => {
+                    ret = Err("Incorrect record format found".to_string());
+                    break;
                 }
             };
 
-            // Loop through the records and remove the one with the given ID
-            for result in csv_reader.deserialize::<CSVRecord>() {
-                let record: CSVRecord = match result {
-                    Ok(r) => r,
-                    Err(_e) => {
-                        ret = Err("Incorrect record format found".to_string());
-                        break;
-                    }
-                };
-
-                if id != record.id {
-                    records.push(record);
-                }
-            }
+            predicate(record);
         }
+
+        ret
+    }
+
+    fn write_csv(csv_file: String, records: Vec<CSVRecord>) -> Result<(), String> {
+        let mut ret = Ok(());
 
         // Open the CSV file for writing
         let csv_file = match OpenOptions::new()
@@ -163,7 +185,7 @@ impl DatabaseManager for CSVManager {
             .create(true)
             .append(false)
             .truncate(true)
-            .open("todo.csv")
+            .open(csv_file)
         {
             Ok(f) => f,
             Err(e) => {
@@ -172,7 +194,6 @@ impl DatabaseManager for CSVManager {
             }
         };
 
-        // Create a CSV writer
         let mut csv_writer = csv::WriterBuilder::new()
             .has_headers(true)
             .from_writer(csv_file);
@@ -195,84 +216,33 @@ impl DatabaseManager for CSVManager {
 
         ret
     }
-}
 
-impl CSVManager {
     fn update_field(id: u64, field: String, value: String) -> Result<(), String> {
-        let mut ret = Ok(());
+        let mut ret;
         let mut records: Vec<CSVRecord> = Vec::new();
 
         // Read the CSV file
-        {
-            // Create the CSV reader
-            let mut csv_reader = match csv::Reader::from_path("todo.csv") {
-                Ok(r) => r,
-                Err(e) => {
-                    return Err(e.to_string());
-                }
-            };
-
-            // Loop through the records updating the field of the corresponding one
-            for result in csv_reader.deserialize::<CSVRecord>() {
-                let mut record: CSVRecord = match result {
-                    Ok(r) => r,
-                    Err(_e) => {
-                        ret = Err("Incorrect record format found".to_string());
-                        break;
+        let push_record = |mut record: CSVRecord| {
+            if id == record.id {
+                match field.as_str() {
+                    "description" => {
+                        record.description = value.clone();
                     }
-                };
-
-                if id == record.id {
-                    match field.as_str() {
-                        "description" => {
-                            record.description = value.clone();
-                        }
-                        "status" => {
-                            record.status = value.clone();
-                        }
-                        _ => (),
+                    "status" => {
+                        record.status = value.clone();
                     }
-                    record.last_updated = Self::now_string();
+                    _ => (),
                 }
-                records.push(record);
+                record.last_updated = CSVManager::now_string();
             }
-        }
-
-        // Open the CSV file for writing
-        let csv_file = match OpenOptions::new()
-            .write(true)
-            .create(true)
-            .append(false)
-            .truncate(true)
-            .open("todo.csv")
-        {
-            Ok(f) => f,
-            Err(e) => {
-                ret = Err(e.to_string());
-                return ret;
-            }
+            records.push(record);
         };
 
-        // Create a CSV writer
-        let mut csv_writer = csv::WriterBuilder::new()
-            .has_headers(true)
-            .from_writer(csv_file);
+        ret = CSVManager::read_csv("todo.csv".to_string(), push_record);
 
-        for record in records {
-            match csv_writer.serialize(record) {
-                Ok(_) => (),
-                Err(_e) => {
-                    ret = Err("Failed serialize record".to_string());
-                }
-            };
+        if !ret.is_err() {
+            ret = CSVManager::write_csv("todo.csv".to_string(), records);
         }
-
-        match csv_writer.flush() {
-            Ok(_) => (),
-            Err(_e) => {
-                ret = Err("Failed to flush CSV file 'todo.csv'".to_string());
-            }
-        };
 
         ret
     }
