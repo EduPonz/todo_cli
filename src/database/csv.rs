@@ -126,6 +126,75 @@ impl DatabaseManager for CSVManager {
     fn update_status(id: u64, status: String) -> Result<(), String> {
         CSVManager::update_field(id, "status".to_string(), status)
     }
+
+    fn remove(id: u64) -> Result<(), String> {
+        let mut ret = Ok(());
+        let mut records: Vec<CSVRecord> = Vec::new();
+
+        // Read the CSV file
+        {
+            // Create the CSV reader
+            let mut csv_reader = match csv::Reader::from_path("todo.csv") {
+                Ok(r) => r,
+                Err(e) => {
+                    return Err(e.to_string());
+                }
+            };
+
+            // Loop through the records and remove the one with the given ID
+            for result in csv_reader.deserialize::<CSVRecord>() {
+                let record: CSVRecord = match result {
+                    Ok(r) => r,
+                    Err(_e) => {
+                        ret = Err("Incorrect record format found".to_string());
+                        break;
+                    }
+                };
+
+                if id != record.id {
+                    records.push(record);
+                }
+            }
+        }
+
+        // Open the CSV file for writing
+        let csv_file = match OpenOptions::new()
+            .write(true)
+            .create(true)
+            .append(false)
+            .truncate(true)
+            .open("todo.csv")
+        {
+            Ok(f) => f,
+            Err(e) => {
+                ret = Err(e.to_string());
+                return ret;
+            }
+        };
+
+        // Create a CSV writer
+        let mut csv_writer = csv::WriterBuilder::new()
+            .has_headers(true)
+            .from_writer(csv_file);
+
+        for record in records {
+            match csv_writer.serialize(record) {
+                Ok(_) => (),
+                Err(_e) => {
+                    ret = Err("Failed serialize record".to_string());
+                }
+            };
+        }
+
+        match csv_writer.flush() {
+            Ok(_) => (),
+            Err(_e) => {
+                ret = Err("Failed to flush CSV file 'todo.csv'".to_string());
+            }
+        };
+
+        ret
+    }
 }
 
 impl CSVManager {

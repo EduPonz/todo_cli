@@ -19,7 +19,7 @@ impl Parser for Adder {
         let mut ret = Ok(());
 
         // Check if there are enough arguments
-        if args.len() == 0 {
+        if args.len() < 1 {
             Self::print_help();
             ret = Err("Not enough arguments".to_string());
         }

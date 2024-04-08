@@ -1,5 +1,6 @@
 use crate::parser::add::Adder;
 use crate::parser::list::List;
+use crate::parser::remove::Remover;
 use crate::parser::update::Updater;
 use crate::parser::Parser;
 
@@ -68,8 +69,7 @@ impl Parser for RootParser {
                     ret = Updater::parse(args[2..args.len()].to_vec());
                 }
                 "remove" => {
-                    println!("remove is not implemented yet");
-                    ret = Ok(());
+                    ret = Remover::parse(args[2..args.len()].to_vec());
                 }
                 _ => {
                     Self::print_help();

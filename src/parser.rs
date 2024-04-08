@@ -2,6 +2,7 @@ pub mod root;
 
 mod add;
 mod list;
+mod remove;
 mod update;
 
 pub trait Parser {

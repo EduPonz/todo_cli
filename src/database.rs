@@ -5,4 +5,5 @@ pub trait DatabaseManager {
     fn list() -> Result<(), String>;
     fn update_description(id: u64, description: String) -> Result<(), String>;
     fn update_status(id: u64, status: String) -> Result<(), String>;
+    fn remove(id: u64) -> Result<(), String>;
 }
